@@ -1,0 +1,153 @@
+=======================================
+ConVar.Admin.cs
+
+entid func:
+if (@string == "admin_tc")
+{
+	TrashMod.AdminTCCommand(arg, baseEntity);
+	return;
+}
+
+=======================================
+ConVar.Chat.cs
+Edit chat color of admin to default
+
+================================================
+ConVar.Inventory.cs
+Remove server broadcasts for inventory give commands
+
+=======================================
+AutoTurret.cs
+public override void OnAttacked(HitInfo info)
+{
+	base.OnAttacked(info);
+	if ((this.IsOnline() && !this.HasTarget()) || !this.targetVisible)
+	{
+		if (info.Initiator as AutoTurret != null)
+		{
+			return;
+		}
+		BasePlayer basePlayer = info.Initiator as BasePlayer;
+		if (!basePlayer || (!basePlayer.IsAdmin && !this.IsAuthed(basePlayer)))
+		{
+			this.SetTarget(info.Initiator as BaseCombatEntity);
+		}
+	}
+}
+
+protected virtual bool Ignore(global::BasePlayer player)
+{
+	return player.IsAdmin;
+}
+
+public virtual bool IsEntityHostile(BaseCombatEntity ent)
+{
+	global::BasePlayer bp = ent as global::BasePlayer;
+	return (!bp || !bp.IsAdmin) && ent.IsHostile();
+}
+
+=======================================
+ConsoleGen.cs
+Trash.TrashMod.Commands.AdminESPCommand,
+Trash.TrashMod.Commands.FreebuildCommand,
+Trash.TrashMod.Commands.InvisibleCommand,
+			
+=======================================
+BasePlayer.cs
+
+public bool IsInvisible;
+public bool ESPOn;
+public float lastESP;
+
+OnReceiveTick:
+Trash.TrashMod.TickESP(this);
+
+=======================================
+BaseNetworkable.cs
+public virtual bool ShouldNetworkTo(global::BasePlayer player)
+{
+	return Trash.TrashMod.ShouldNetworkToTrash(this, player);
+}
+
+=======================================
+PatrolHelicopterAI.cs
+WasAttacked:
+&& !basePlayer.IsAdmin
+
+ValidStrafeTarget:
+&& !ply.IsAdmin;
+
+public void UpdateTargetList() - !basePlayer.IsAdmin
+
+=======================================
+FlameTurret.cs
+CheckTrigger:
+&& !basePlayer.IsAdmin
+		
+================================================
+Landmine.cs
+public void Trigger(BasePlayer ply = null)
+{
+	if (ply && !ply.IsAdmin)
+	{
+		this.triggerPlayerID = ply.userID;
+	}
+	if (!ply || !ply.IsAdmin)
+	{
+		base.SetFlag(BaseEntity.Flags.Open, true, false, true);
+		base.SendNetworkUpdate(BasePlayer.NetworkQueue.Update);
+	}
+}
+
+================================================
+GunTrap.cs
+CheckTrigger:
+!basePlayer.IsAdmin
+
+=======================================
+Planner.cs
+CanAffordToPlace:
+if (ownerPlayer.IsAdmin && Trash.TrashMod.FreeBuild)
+{
+	return true;
+}
+	
+DoPlacement:
+if (Trash.TrashMod.FreeBuild && ownerPlayer.IsAdmin)
+{
+	buildingBlock.SetGrade(BuildingGrade.Enum.Metal);
+}
+else
+{
+	buildingBlock.SetGrade(buildingBlock.blockDefinition.defaultGrade.gradeBase.type);
+}
+
+PayForPlacement:
+if (player.IsAdmin && Trash.TrashMod.FreeBuild)
+{
+	return;
+}
+	
+=======================================
+BuildingPrivlidge.cs
+public bool isFreeUpkeep;
+
+ApplyUpkeepPayment:
+if (this.isFreeUpkeep)
+{
+	return;
+}
+	
+================================================
+BuildingBlock.cs
+PayForUpgrade:
+if (player.IsAdmin && Trash.TrashMod.FreeBuild)
+{
+	return;
+}
+
+CanAffordUpgrade:
+if (player.IsAdmin && Trash.TrashMod.FreeBuild)
+{
+	return true;
+}
