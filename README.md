@@ -10,3 +10,14 @@ Features
  * Admin Instant Upgrade - Admins can build with a different building grade (Metal is default).
  * Admin Free Upgrade - Admins can upgrade buildings with no cost.
  * Invisible Admin - Admins can go invisible (only other admins can see them).
+ 
+Command List
+===
+```
+ent admin_tc
+global.freebuild
+global.invisible
+global.esp
+global.admin_no_target
+global.default_building_grade
+```
