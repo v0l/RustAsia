@@ -28,7 +28,7 @@ public override void OnAttacked(HitInfo info)
 			return;
 		}
 		BasePlayer basePlayer = info.Initiator as BasePlayer;
-		if (!basePlayer || (!basePlayer.IsAdmin && !this.IsAuthed(basePlayer)))
+		if (!basePlayer || ((!basePlayer.IsAdmin || !TrashMod.AdminNoTarget) && !this.IsAuthed(basePlayer)))
 		{
 			this.SetTarget(info.Initiator as BaseCombatEntity);
 		}
@@ -37,20 +37,22 @@ public override void OnAttacked(HitInfo info)
 
 protected virtual bool Ignore(global::BasePlayer player)
 {
-	return player.IsAdmin;
+	return player.IsAdmin && TrashMod.AdminNoTarget;
 }
 
 public virtual bool IsEntityHostile(BaseCombatEntity ent)
 {
 	global::BasePlayer bp = ent as global::BasePlayer;
-	return (!bp || !bp.IsAdmin) && ent.IsHostile();
+	return (!basePlayer || !basePlayer.IsAdmin || !TrashMod.AdminNoTarget) && ent.IsHostile();
 }
 
 =======================================
 ConsoleGen.cs
-Trash.TrashMod.Commands.AdminESPCommand,
-Trash.TrashMod.Commands.FreebuildCommand,
-Trash.TrashMod.Commands.InvisibleCommand,
+TrashMod.Commands.AdminESPCommand,
+TrashMod.Commands.FreebuildCommand,
+TrashMod.Commands.InvisibleCommand,
+TrashMod.Commands.AdminNoTargetCommand,
+TrashMod.Commands.DefaultBuildTypeCommand,
 			
 =======================================
 BasePlayer.cs
@@ -58,6 +60,7 @@ BasePlayer.cs
 public bool IsInvisible;
 public bool ESPOn;
 public float lastESP;
+public BuildingGrade.Enum FreeBuildType = BuildingGrade.Enum.Metal;
 
 OnReceiveTick:
 Trash.TrashMod.TickESP(this);
@@ -72,27 +75,27 @@ public virtual bool ShouldNetworkTo(global::BasePlayer player)
 =======================================
 PatrolHelicopterAI.cs
 WasAttacked:
-&& !basePlayer.IsAdmin
+if (basePlayer != null && (!basePlayer.IsAdmin || !TrashMod.AdminNoTarget))
 
 ValidStrafeTarget:
-&& !ply.IsAdmin;
+return (!ply.IsAdmin || !TrashMod.AdminNoTarget) && !ply.IsNearEnemyBase();
 
-public void UpdateTargetList() - !basePlayer.IsAdmin
+public void UpdateTargetList() - (!basePlayer.IsAdmin || !TrashMod.AdminNoTarget)
 
 =======================================
 FlameTurret.cs
 CheckTrigger:
-&& !basePlayer.IsAdmin
+&& (!basePlayer.IsAdmin || !TrashMod.AdminNoTarget)
 		
 ================================================
 Landmine.cs
 public void Trigger(BasePlayer ply = null)
 {
-	if (ply && !ply.IsAdmin)
+	if (ply && (!ply.IsAdmin || !TrashMod.AdminNoTarget))
 	{
 		this.triggerPlayerID = ply.userID;
 	}
-	if (!ply || !ply.IsAdmin)
+	if (!ply || !ply.IsAdmin || !TrashMod.AdminNoTarget)
 	{
 		base.SetFlag(BaseEntity.Flags.Open, true, false, true);
 		base.SendNetworkUpdate(BasePlayer.NetworkQueue.Update);
@@ -102,7 +105,7 @@ public void Trigger(BasePlayer ply = null)
 ================================================
 GunTrap.cs
 CheckTrigger:
-!basePlayer.IsAdmin
+(!basePlayer.IsAdmin || !Trash.TrashMod.AdminNoTarget)
 
 =======================================
 Planner.cs

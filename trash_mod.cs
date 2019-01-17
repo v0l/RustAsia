@@ -9,7 +9,7 @@ namespace Trash
 	// Token: 0x02000B97 RID: 2967
 	public static class TrashMod
 	{
-		// Token: 0x06003FAE RID: 16302 RVA: 0x0012C47C File Offset: 0x0012A67C
+		// Token: 0x06003FAE RID: 16302
 		public static void Disappear(this BasePlayer ply)
 		{
 			if (!ply.IsConnected || ply.IsInvisible || ply.HasPlayerFlag(BasePlayer.PlayerFlags.ReceivingSnapshot))
@@ -43,11 +43,11 @@ namespace Trash
 			CommunityEntity.ServerInstance.ClientRPCEx<string>(new SendInfo
 			{
 				connection = ply.net.connection
-			}, null, "AddUI", "[{\"name\":\"InvisibleIndicator\",\"parent\":\"Overlay\",\"components\":[{\"type\":\"UnityEngine.UI.RawImage\",\"url\":\"https://rustasia.com/fa-eye.png\"},{\"type\":\"RectTransform\",\"anchormin\":\"0 0\",\"anchormax\":\"1 1\"}]}]");
+			}, null, "AddUI", "[{\"name\":\"InvisibleIndicator\",\"parent\":\"Hud\",\"components\":[{\"type\":\"UnityEngine.UI.RawImage\",\"url\":\"https://rustasia.com/fa-eye.png\",\"color\":\"1 1 1 0.5\"},{\"type\":\"RectTransform\",\"anchormin\":\"0.175 0.017\",\"anchormax\":\"0.22 0.08\"}]}]");
 			ply.IsInvisible = true;
 		}
 
-		// Token: 0x06003FAF RID: 16303 RVA: 0x0012C5CC File Offset: 0x0012A7CC
+		// Token: 0x06003FAF RID: 16303
 		public static void Reappear(this BasePlayer ply)
 		{
 			if (!ply.IsInvisible)
@@ -69,7 +69,7 @@ namespace Trash
 			}, null, "DestroyUI", "InvisibleIndicator");
 		}
 
-		// Token: 0x06003FB0 RID: 16304 RVA: 0x0012C648 File Offset: 0x0012A848
+		// Token: 0x06003FB0 RID: 16304
 		public static void ESPText(this BasePlayer ply, BasePlayer adminPly)
 		{
 			adminPly.SendConsoleCommand("ddraw.text", new object[]
@@ -82,7 +82,7 @@ namespace Trash
 					ply.displayName ?? ply.userID.ToString(),
 					(int)ply.health,
 					Math.Floor((double)Vector3.Distance(ply.transform.position, adminPly.transform.position)),
-					ply.IsInvisible ? "Invisible" : string.Empty
+					ply.IsInvisible ? " Invisible" : string.Empty
 				})
 			});
 		}
@@ -103,7 +103,7 @@ namespace Trash
 			}
 		}
 
-		// Token: 0x06003FB2 RID: 16306 RVA: 0x0012C7B8 File Offset: 0x0012A9B8
+		// Token: 0x06003FB2 RID: 16306
 		public static bool ShouldNetworkToTrash(BaseNetworkable net, BasePlayer player)
 		{
 			BasePlayer basePlayer;
@@ -116,7 +116,7 @@ namespace Trash
 			return basePlayer2 == null || player == null || basePlayer2 == player || player.IsAdmin || !basePlayer2.IsInvisible;
 		}
 
-		// Token: 0x06003FB3 RID: 16307 RVA: 0x0012C820 File Offset: 0x0012AA20
+		// Token: 0x06003FB3 RID: 16307
 		public static void ESPCommand(ConsoleSystem.Arg arg)
 		{
 			BasePlayer basePlayer = arg.Player();
@@ -124,7 +124,7 @@ namespace Trash
 			basePlayer.ChatMessage(string.Format("ESP {0}", basePlayer.ESPOn ? "on" : "off"));
 		}
 
-		// Token: 0x06003FB4 RID: 16308 RVA: 0x0012C868 File Offset: 0x0012AA68
+		// Token: 0x06003FB4 RID: 16308
 		public static void AdminTCCommand(ConsoleSystem.Arg arg, BaseEntity baseEntity)
 		{
 			BuildingPrivlidge buildingPrivlidge = baseEntity as BuildingPrivlidge;
@@ -141,11 +141,14 @@ namespace Trash
 		// Token: 0x04002F76 RID: 12150
 		public static bool FreeBuild;
 
+		// Token: 0x04002F83 RID: 12163
+		public static bool AdminNoTarget = true;
+
 		// Token: 0x02000B98 RID: 2968
 		public static class Commands
 		{
 			// Token: 0x170005F6 RID: 1526
-			// (get) Token: 0x06003FB5 RID: 16309 RVA: 0x0012C8DC File Offset: 0x0012AADC
+			// (get) Token: 0x06003FB5 RID: 16309
 			public static ConsoleSystem.Command FreebuildCommand
 			{
 				get
@@ -166,7 +169,7 @@ namespace Trash
 			}
 
 			// Token: 0x170005F7 RID: 1527
-			// (get) Token: 0x06003FB6 RID: 16310 RVA: 0x0012C968 File Offset: 0x0012AB68
+			// (get) Token: 0x06003FB6 RID: 16310
 			public static ConsoleSystem.Command InvisibleCommand
 			{
 				get
@@ -198,7 +201,7 @@ namespace Trash
 			}
 
 			// Token: 0x170005F8 RID: 1528
-			// (get) Token: 0x06003FB7 RID: 16311 RVA: 0x0012C9D0 File Offset: 0x0012ABD0
+			// (get) Token: 0x06003FB7 RID: 16311
 			public static ConsoleSystem.Command AdminESPCommand
 			{
 				get
@@ -212,6 +215,69 @@ namespace Trash
 					command.Call = delegate(ConsoleSystem.Arg arg)
 					{
 						TrashMod.ESPCommand(arg);
+					};
+					return command;
+				}
+			}
+
+			// Token: 0x170005FC RID: 1532
+			// (get) Token: 0x06003FC8 RID: 16328
+			public static ConsoleSystem.Command AdminNoTargetCommand
+			{
+				get
+				{
+					ConsoleSystem.Command command = new ConsoleSystem.Command();
+					command.Name = "admin_no_target";
+					command.Parent = "global";
+					command.FullName = "global.admin_no_target";
+					command.ServerAdmin = true;
+					command.Variable = true;
+					command.GetOveride = (() => TrashMod.AdminNoTarget.ToString());
+					command.SetOveride = delegate(string str)
+					{
+						TrashMod.AdminNoTarget = str.ToBool();
+					};
+					return command;
+				}
+			}
+
+			// Token: 0x17000622 RID: 1570
+			// (get) Token: 0x060042B5 RID: 17077
+			public static ConsoleSystem.Command DefaultBuildTypeCommand
+			{
+				get
+				{
+					ConsoleSystem.Command command = new ConsoleSystem.Command();
+					command.Name = "default_building_grade";
+					command.Parent = "global";
+					command.FullName = "global.default_building_grade";
+					command.ServerAdmin = true;
+					command.Variable = false;
+					command.Call = delegate(ConsoleSystem.Arg arg)
+					{
+						BasePlayer ply = arg.Player();
+						if (ply != null)
+						{
+							if (arg.Args.Length != 0)
+							{
+								object p = Enum.Parse(typeof(BuildingGrade.Enum), arg.Args[0]);
+								if (p != null)
+								{
+									ply.FreeBuildType = (BuildingGrade.Enum)p;
+									arg.ReplyWith(ply.FreeBuildType.ToString());
+									return;
+								}
+								arg.ReplyWith(string.Format("Cant find building grade {0}, must be {1}", arg.Args[0], string.Join(", ", new object[]
+								{
+									Enum.GetValues(typeof(BuildingGrade.Enum))
+								})));
+								return;
+							}
+							else
+							{
+								arg.ReplyWith(ply.FreeBuildType.ToString());
+							}
+						}
 					};
 					return command;
 				}
