@@ -3,21 +3,22 @@
   <PropertyGroup>
     <TargetFrameworks>net46</TargetFrameworks>
   <LangVersion>latest</LangVersion>
-  <AssemblyVersion>1.0.0</AssemblyVersion>
-  <FileVersion>1.0.0</FileVersion>
+  <AssemblyVersion>1.0.1</AssemblyVersion>
+  <FileVersion>1.0.1</FileVersion>
   <Authors>Kieran</Authors>
   <Company>RustAsia.com</Company>
   <Product>RustAsia Vanilla Mod</Product>
   <Description>RustAsia Rust Dedicated Server Mod</Description>
   <Copyright>© 2019 RustAsia.com</Copyright>
+  <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\..\..\Downloads\steamcmd\steamapps\common\rust_dedicated\RustDedicated_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\..\..\..\Downloads\steamcmd\steamapps\common\rust_dedicated\RustDedicated_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\Downloads\steamcmd\steamapps\common\rust_dedicated\RustDedicated_Data\Managed\Assembly-CSharp_props.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.Console">
       <HintPath>..\..\..\..\Downloads\steamcmd\steamapps\common\rust_dedicated\RustDedicated_Data\Managed\Facepunch.Console.dll</HintPath>

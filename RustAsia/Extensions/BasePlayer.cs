@@ -85,7 +85,17 @@ namespace RustAsia.Extensions
 
         public static void TickESP(BasePlayer ply)
         {
-            
+            if (ply.ESPOn && ply.lastESP + Variables.ESPTickRate < (double)Time.time)
+            {
+                ply.lastESP = Time.time;
+                foreach (BasePlayer basePlayer in BasePlayer.activePlayerList)
+                {
+                    if (basePlayer != null && basePlayer.IsConnected)
+                    {
+                        ESPText(basePlayer, ply);
+                    }
+                }
+            }
         }
     }
 }
