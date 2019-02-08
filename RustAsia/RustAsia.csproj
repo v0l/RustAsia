@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net46</TargetFrameworks>
+  <LangVersion>latest</LangVersion>
+  <AssemblyVersion>1.0.0</AssemblyVersion>
+  <FileVersion>1.0.0</FileVersion>
+  <Authors>Kieran</Authors>
+  <Company>RustAsia.com</Company>
+  <Product>RustAsia Vanilla Mod</Product>
+  <Description>RustAsia Rust Dedicated Server Mod</Description>
+  <Copyright>© 2019 RustAsia.com</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>..\..\..\..\Downloads\steamcmd\steamapps\common\rust_dedicated\RustDedicated_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\..\..\Downloads\steamcmd\steamapps\common\rust_dedicated\RustDedicated_Data\Managed\Assembly-CSharp_props.dll</HintPath>
+    </Reference>
+    <Reference Include="Facepunch.Console">
+      <HintPath>..\..\..\..\Downloads\steamcmd\steamapps\common\rust_dedicated\RustDedicated_Data\Managed\Facepunch.Console.dll</HintPath>
+    </Reference>
+    <Reference Include="Facepunch.Network">
+      <HintPath>..\..\..\..\Downloads\steamcmd\steamapps\common\rust_dedicated\RustDedicated_Data\Managed\Facepunch.Network.dll</HintPath>
+    </Reference>
+    <Reference Include="Facepunch.System">
+      <HintPath>..\..\..\..\Downloads\steamcmd\steamapps\common\rust_dedicated\RustDedicated_Data\Managed\Facepunch.System.dll</HintPath>
+    </Reference>
+    <Reference Include="Facepunch.UnityEngine">
+      <HintPath>..\..\..\..\Downloads\steamcmd\steamapps\common\rust_dedicated\RustDedicated_Data\Managed\Facepunch.UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="protobuf-net">
+      <HintPath>..\..\..\..\Downloads\steamcmd\steamapps\common\rust_dedicated\RustDedicated_Data\Managed\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Dataflow">
+      <HintPath>..\..\..\..\Downloads\steamcmd\steamapps\common\rust_dedicated\RustDedicated_Data\Managed\System.Threading.Tasks.Dataflow.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\..\..\..\Downloads\steamcmd\steamapps\common\rust_dedicated\RustDedicated_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

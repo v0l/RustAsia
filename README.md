@@ -10,6 +10,7 @@ Features
  * Admin Instant Upgrade - Admins can build with a different building grade (Metal is default).
  * Admin Free Upgrade - Admins can upgrade buildings with no cost.
  * Invisible Admin - Admins can go invisible (only other admins can see them).
+ * Un-Lootable Admins - Admins cant be looted while wounded or sleeping, admin corpses are empty.
  
 Command List
 ===
@@ -20,4 +21,5 @@ global.invisible
 global.esp
 global.admin_no_target
 global.default_building_grade
+global.lootable_admins
 ```

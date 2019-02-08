@@ -1,10 +1,22 @@
+Bootstrap.cs
+StartServer:
+Core.Init(new Action<string>(Bootstrap.WriteToLog));
+
 =======================================
 ConVar.Admin.cs
 
 entid func:
 if (@string == "admin_tc")
 {
-	TrashMod.AdminTCCommand(arg, baseEntity);
+	BuildingPrivlidge buildingPrivlidge = baseEntity as BuildingPrivlidge;
+	if (buildingPrivlidge != null)
+	{
+		buildingPrivlidge.isFreeUpkeep = !buildingPrivlidge.isFreeUpkeep;
+		buildingPrivlidge.AddDelayedUpdate();
+		arg.ReplyWith(string.Format("{0}: {1}", baseEntity.net.ID, buildingPrivlidge.isFreeUpkeep ? "True" : "False"));
+		return;
+	}
+	arg.ReplyWith("Not a tool cupboard");
 	return;
 }
 
@@ -12,90 +24,80 @@ if (@string == "admin_tc")
 ConVar.Chat.cs
 Edit chat color of admin to default
 
+After new ChatEntry() in say/Broadcast add:
+PlayerMods.PublicLog(chatEntry.Username + ": " + chatEntry.Message);
+
 ================================================
 ConVar.Inventory.cs
 Remove server broadcasts for inventory give commands
 
 =======================================
 AutoTurret.cs
-public override void OnAttacked(HitInfo info)
-{
-	base.OnAttacked(info);
-	if ((this.IsOnline() && !this.HasTarget()) || !this.targetVisible)
-	{
-		if (info.Initiator as AutoTurret != null)
-		{
-			return;
-		}
-		BasePlayer basePlayer = info.Initiator as BasePlayer;
-		if (!basePlayer || ((!basePlayer.IsAdmin || !TrashMod.AdminNoTarget) && !this.IsAuthed(basePlayer)))
-		{
-			this.SetTarget(info.Initiator as BaseCombatEntity);
-		}
-	}
-}
+OnAttacked:
+if (!basePlayer || ((!basePlayer.IsAdmin || !RustAsia.System.Variables.AdminNoTarget) && !this.IsAuthed(basePlayer)))
 
-protected virtual bool Ignore(global::BasePlayer player)
-{
-	return player.IsAdmin && TrashMod.AdminNoTarget;
-}
+Ignore:
+return player.IsAdmin && RustAsia.System.Variables.AdminNoTarget;
 
-public virtual bool IsEntityHostile(BaseCombatEntity ent)
-{
-	global::BasePlayer bp = ent as global::BasePlayer;
-	return (!basePlayer || !basePlayer.IsAdmin || !TrashMod.AdminNoTarget) && ent.IsHostile();
-}
+IsEntityHostile:
+global::BasePlayer basePlayer = ent as global::BasePlayer;
+return (!basePlayer || !basePlayer.IsAdmin || !RustAsia.AdminMods.AdminNoTarget) && ent.IsHostile();
 
-=======================================
-ConsoleGen.cs
-TrashMod.Commands.AdminESPCommand,
-TrashMod.Commands.FreebuildCommand,
-TrashMod.Commands.InvisibleCommand,
-TrashMod.Commands.AdminNoTargetCommand,
-TrashMod.Commands.DefaultBuildTypeCommand,
 			
 =======================================
 BasePlayer.cs
 
-public bool IsInvisible;
-public bool ESPOn;
-public float lastESP;
-public BuildingGrade.Enum FreeBuildType = BuildingGrade.Enum.Metal;
+public bool IsInvisible { get; set; }
+public bool ESPOn { get; set; }
+public float lastESP { get; set; }
+public BuildingGrade.Enum FreeBuildType { get; set; } = BuildingGrade.Enum.Metal;
 
 OnReceiveTick:
-Trash.TrashMod.TickESP(this);
+RustAsia.AdminMods.TickESP(this);
+
+CanBeLooted:
+&& (!this.IsAdmin || !RustAsia.System.Variables.LootableAdmins)
+
+CreateCorpse:
+if (!this.IsAdmin || RustAsia.System.Variables.LootableAdmins) { lootableCorpse.TakeFrom... } 
+
+Hurt:
+if (this.IsAdmin && !RustAsia.System.Variables.LootableAdmins && (this.IsSleeping() || this.IsWounded()))
+{
+	return;
+}
 
 =======================================
 BaseNetworkable.cs
 public virtual bool ShouldNetworkTo(global::BasePlayer player)
 {
-	return Trash.TrashMod.ShouldNetworkToTrash(this, player);
+	return RustAsia.AdminMods.ShouldNetworkToTrash(this, player);
 }
 
 =======================================
 PatrolHelicopterAI.cs
 WasAttacked:
-if (basePlayer != null && (!basePlayer.IsAdmin || !TrashMod.AdminNoTarget))
+if (basePlayer != null && (!basePlayer.IsAdmin || !RustAsia.System.Variables.AdminNoTarget))
 
 ValidStrafeTarget:
-return (!ply.IsAdmin || !TrashMod.AdminNoTarget) && !ply.IsNearEnemyBase();
+return (!ply.IsAdmin || !RustAsia.System.Variables.AdminNoTarget) && !ply.IsNearEnemyBase();
 
-public void UpdateTargetList() - (!basePlayer.IsAdmin || !TrashMod.AdminNoTarget)
+public void UpdateTargetList() - (!basePlayer.IsAdmin || !RustAsia.System.Variables.AdminNoTarget)
 
 =======================================
 FlameTurret.cs
 CheckTrigger:
-&& (!basePlayer.IsAdmin || !TrashMod.AdminNoTarget)
+&& (!component.IsAdmin || !RustAsia.System.Variables.AdminNoTarget)
 		
 ================================================
 Landmine.cs
 public void Trigger(BasePlayer ply = null)
 {
-	if (ply && (!ply.IsAdmin || !TrashMod.AdminNoTarget))
+	if (ply && (!ply.IsAdmin || !RustAsia.System.Variables.AdminNoTarget))
 	{
 		this.triggerPlayerID = ply.userID;
 	}
-	if (!ply || !ply.IsAdmin || !TrashMod.AdminNoTarget)
+	if (!ply || !ply.IsAdmin || !RustAsia.System.Variables.AdminNoTarget)
 	{
 		base.SetFlag(BaseEntity.Flags.Open, true, false, true);
 		base.SendNetworkUpdate(BasePlayer.NetworkQueue.Update);
@@ -105,20 +107,20 @@ public void Trigger(BasePlayer ply = null)
 ================================================
 GunTrap.cs
 CheckTrigger:
-(!basePlayer.IsAdmin || !Trash.TrashMod.AdminNoTarget)
+&& (!component.IsAdmin || !RustAsia.System.Variables.AdminNoTarget)
 
 =======================================
 Planner.cs
 CanAffordToPlace:
-if (ownerPlayer.IsAdmin && Trash.TrashMod.FreeBuild)
+if (ownerPlayer.IsAdmin && RustAsia.System.Variables.FreeBuild)
 {
 	return true;
 }
 	
 DoPlacement:
-if (Trash.TrashMod.FreeBuild && ownerPlayer.IsAdmin)
+if (RustAsia.System.Variables.FreeBuild && ownerPlayer.IsAdmin)
 {
-	buildingBlock.SetGrade(BuildingGrade.Enum.Metal);
+	buildingBlock.SetGrade(ownerPlayer.FreeBuildType);
 }
 else
 {
@@ -126,14 +128,14 @@ else
 }
 
 PayForPlacement:
-if (player.IsAdmin && Trash.TrashMod.FreeBuild)
+if (player.IsAdmin && RustAsia.System.Variables.FreeBuild)
 {
 	return;
 }
 	
 =======================================
 BuildingPrivlidge.cs
-public bool isFreeUpkeep;
+public bool isFreeUpkeep { get; set; }
 
 ApplyUpkeepPayment:
 if (this.isFreeUpkeep)
@@ -144,13 +146,18 @@ if (this.isFreeUpkeep)
 ================================================
 BuildingBlock.cs
 PayForUpgrade:
-if (player.IsAdmin && Trash.TrashMod.FreeBuild)
+if (player.IsAdmin && RustAsia.System.Variables.FreeBuild)
 {
 	return;
 }
 
 CanAffordUpgrade:
-if (player.IsAdmin && Trash.TrashMod.FreeBuild)
+if (player.IsAdmin && RustAsia.System.Variables.FreeBuild)
 {
 	return true;
 }
+
+================================================
+CombatLog.cs
+Log:
+PlayerMods.LogStats(new CombatEvent(val));
