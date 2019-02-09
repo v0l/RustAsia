@@ -8,7 +8,8 @@ namespace RustAsia.System
 {
     public static class Core
     {
-        public static readonly string Name = $"RustAsia v{Assembly.GetExecutingAssembly().GetName().Version} (Rust v{Rust.Protocol.printable})";
+        public static readonly string Version = "v1.0.2";
+        public static readonly string Name = $"RustAsia {Version} (Rust v{Rust.Protocol.printable})";
 
         public static async Task Init(Action<string> logFunction)
         {

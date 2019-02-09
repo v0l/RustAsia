@@ -1,4 +1,5 @@
 ﻿using Network;
+using RustAsia.Admin;
 using RustAsia.System;
 using System;
 using System.Collections.Generic;
@@ -66,7 +67,7 @@ namespace RustAsia.Extensions
             }, null, "DestroyUI", "InvisibleIndicator");
         }
 
-        public static void ESPText(BasePlayer ply, BasePlayer adminPly)
+        public static void ESPText(BasePlayer adminPly, BasePlayer ply)
         {
             adminPly.SendConsoleCommand("ddraw.text", new object[]
             {
@@ -78,21 +79,108 @@ namespace RustAsia.Extensions
                     ply.displayName ?? ply.userID.ToString(),
                     (int)ply.health,
                     Math.Floor((double)Vector3.Distance(ply.transform.position, adminPly.transform.position)),
-                    ply.IsInvisible ? " [INVS]" : string.Empty
+                    ply.IsInvisible ? " - [INVS]" : string.Empty
+                })
+            });
+        }
+
+        public static void ESPText(BasePlayer adminPly, BuildingPrivlidge bp)
+        {
+            adminPly.SendConsoleCommand("ddraw.text", new object[]
+            {
+                Variables.ESPSlowTickRate + 0.05f,
+                Color.white,
+                bp.transform.position + new Vector3(0f, 2f, 0f),
+                string.Format("TC - <color=#ffa500>{0} M</color>{1}", new object[]
+                {
+                    Math.Floor((double)Vector3.Distance(bp.transform.position, adminPly.transform.position)),
+                    bp.isFreeUpkeep ? " - [ADMIN_TC]" : string.Empty
+                })
+            });
+        }
+
+        public static void ESPText(BasePlayer adminPly, StashContainer sc)
+        {
+            adminPly.SendConsoleCommand("ddraw.text", new object[]
+            {
+                Variables.ESPSlowTickRate + 0.05f,
+                Color.white,
+                sc.transform.position,
+                string.Format("Stash - <color=#ffa500>{0} M</color> - {1}", new object[]
+                {
+                    Math.Floor((double)Vector3.Distance(sc.transform.position, adminPly.transform.position)),
+                    sc.IsHidden() ? "HIDDEN" : "VISIBLE"
+                })
+            });
+        }
+
+        public static void ESPText(BasePlayer adminPly, BaseAnimalNPC an)
+        {
+            adminPly.SendConsoleCommand("ddraw.text", new object[]
+            {
+                Variables.ESPSlowTickRate + 0.05f,
+                Color.white,
+                an.transform.position,
+                string.Format("{0} - <color=#ffa500>{1} M</color> - {2} HP", new object[]
+                {
+                    an.ShortPrefabName,
+                    Math.Floor((double)Vector3.Distance(an.transform.position, adminPly.transform.position)),
+                    (int)an.health
                 })
             });
         }
 
         public static void TickESP(BasePlayer ply)
         {
-            if (ply.ESPOn && ply.lastESP + Variables.ESPTickRate < (double)Time.time)
+            if (ply.lastESP + Variables.ESPTickRate < (double)Time.time)
             {
+                var pf = (ESPFlags)ply.ESPFlags;
                 ply.lastESP = Time.time;
-                foreach (BasePlayer basePlayer in BasePlayer.activePlayerList)
+
+                if (pf.HasFlag(ESPFlags.Players))
                 {
-                    if (basePlayer != null && basePlayer.IsConnected)
+                    foreach (BasePlayer basePlayer in BasePlayer.activePlayerList)
                     {
-                        ESPText(basePlayer, ply);
+                        if (basePlayer != null && basePlayer.IsConnected)
+                        {
+                            ESPText(ply, basePlayer);
+                        }
+                    }
+                }
+
+                if (pf.HasFlag(ESPFlags.Sleepers))
+                {
+                    foreach (BasePlayer basePlayer in BasePlayer.sleepingPlayerList)
+                    {
+                        if (basePlayer != null)
+                        {
+                            ESPText(ply, basePlayer);
+                        }
+                    }
+                }
+            }
+
+            if (ply.lastSlowESP + Variables.ESPSlowTickRate < (double)Time.time)
+            {
+                var pf = (ESPFlags)ply.ESPFlags;
+                ply.lastSlowESP = Time.time;
+
+                if (pf.HasFlag(ESPFlags.Stashes) || pf.HasFlag(ESPFlags.ToolCupboards) || pf.HasFlag(ESPFlags.Animals))
+                {
+                    foreach (var baseEntity in BaseEntity.serverEntities)
+                    {
+                        if (baseEntity is BuildingPrivlidge bp && pf.HasFlag(ESPFlags.ToolCupboards))
+                        {
+                            ESPText(ply, bp);
+                        }
+                        if (baseEntity is StashContainer sc && pf.HasFlag(ESPFlags.Stashes))
+                        {
+                            ESPText(ply, sc);
+                        }
+                        if (baseEntity is BaseAnimalNPC animal && pf.HasFlag(ESPFlags.Animals))
+                        {
+                            ESPText(ply, animal);
+                        }
                     }
                 }
             }

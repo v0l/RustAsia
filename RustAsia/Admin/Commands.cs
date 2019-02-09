@@ -57,6 +57,35 @@ namespace RustAsia.Admin
             },
             new ConsoleSystem.Command
             {
+                Name = "esp_mode",
+                Parent = "global",
+                FullName = "global.esp_mode",
+                ServerAdmin = true,
+                Variable = false,
+                Call = delegate (ConsoleSystem.Arg arg)
+                {
+                    BasePlayer basePlayer = arg.Player();
+                    try
+                    {
+                        if(Enum.TryParse(arg.Args[0], out ESPFlags flags))
+                        {
+                            basePlayer.ESPFlags = (ulong)flags;
+                            basePlayer.lastESP = basePlayer.lastSlowESP = 0;
+                            arg.ReplyWith($"Current Flags: {((ESPFlags)basePlayer.ESPFlags).ToString()}");
+                        }
+                        else
+                        {
+                            arg.ReplyWith($"Invalid ESPFlags");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        arg.ReplyWith($"Invalid ESPFlags {ex.Message}");
+                    }
+                }
+            },
+            new ConsoleSystem.Command
+            {
                 Name = "esp",
                 Parent = "global",
                 FullName = "global.esp",
@@ -65,8 +94,15 @@ namespace RustAsia.Admin
                 Call = delegate (ConsoleSystem.Arg arg)
                 {
                     BasePlayer basePlayer = arg.Player();
-                    basePlayer.ESPOn = !basePlayer.ESPOn;
-                    basePlayer.ChatMessage(string.Format("ESP {0}", basePlayer.ESPOn ? "on" : "off"));
+                    if (basePlayer.ESPFlags == 0)
+                    {
+                        basePlayer.ESPFlags = (ulong)ESPFlags.Players;
+                    }
+                    else
+                    {
+                        basePlayer.ESPFlags = 0;
+                    }
+                    basePlayer.ChatMessage(string.Format("ESP {0}", basePlayer.ESPFlags > 0 ? "on" : "off"));
                 }
             },
             new ConsoleSystem.Command
@@ -96,10 +132,9 @@ namespace RustAsia.Admin
                     {
                         if (arg.Args.Length != 0)
                         {
-                            object p = Enum.Parse(typeof(BuildingGrade.Enum), arg.Args[0]);
-                            if (p != null)
+                            if (Enum.TryParse(arg.Args[0], out BuildingGrade.Enum bg))
                             {
-                                ply.FreeBuildType = (BuildingGrade.Enum)p;
+                                ply.FreeBuildType = bg;
                                 arg.ReplyWith(ply.FreeBuildType.ToString());
                                 return;
                             }

@@ -5,7 +5,7 @@ Features
  * Incognito Admin Chat - Admin's have the same chat color as normal players.
  * No Give Messages - `inventory.give` and others do not send broadcast messages in chat.
  * Admin No Target - Admins are not targeted by traps (Landmine, AutoTurret, Shotgun Trap, Flame Turret) or heli.
- * Admin ESP - Admins can enable ESP to see where all players are in-game.
+ * Admin ESP - Admins can enable ESP to see players or entities are in game.
  * Admin FreeBuild - Admins can build with not cost.
  * Admin Instant Upgrade - Admins can build with a different building grade (Metal is default).
  * Admin Free Upgrade - Admins can upgrade buildings with no cost.
@@ -19,6 +19,7 @@ ent admin_tc
 global.freebuild
 global.invisible
 global.esp
+global.esp_mode
 global.admin_no_target
 global.default_building_grade
 global.lootable_admins
@@ -32,9 +33,10 @@ How to apply the mod
 BasePlayer:
 ```csharp
 public bool IsInvisible { get; set; }
-public bool ESPOn { get; set; }
 public float lastESP { get; set; }
+public float lastSlowESP { get; set; }
 public BuildingGrade.Enum FreeBuildType { get; set; } = BuildingGrade.Enum.Metal;
+public ulong ESPFlags { get; set; }
 ```
 
 BuildingPrivlidge:
@@ -43,8 +45,10 @@ public bool isFreeUpkeep { get; set; }
 ```
 
 *Step 2:* Save the assembly.
+
 *Step 3:* Compile the RustAsia assembly.
-*Step 4:* Add the following hooks with dnSpy
+
+*Step 4:* Add the following code with [dnSpy](https://github.com/0xd4d/dnSpy)
 
 ConVar.Admin:
 ```csharp
@@ -76,25 +80,10 @@ return player.IsAdmin && RustAsia.System.Variables.AdminNoTarget;
 
 //IsEntityHostile()
 global::BasePlayer basePlayer = ent as global::BasePlayer;
-return (!basePlayer || !basePlayer.IsAdmin || !RustAsia.AdminMods.AdminNoTarget) && ent.IsHostile();
+return (!basePlayer || !basePlayer.IsAdmin || !RustAsia.System.Variables.AdminNoTarget) && ent.IsHostile();
 
 //OnAttacked(), edit basePlayer checks like so.
 if (!basePlayer || ((!basePlayer.IsAdmin || !RustAsia.System.Variables.AdminNoTarget) && !this.IsAuthed(basePlayer)))
-```
-
-BaseNetworkable:
-```csharp
-//The following edit should be done (as IL edit)
-/*
- * ldarg.0
- * ldarg.1
- * call RustAsia.Extensions.BaseNetworkableExt.ShouldNetworkToInvisible
- * ret
-*/
-public virtual bool ShouldNetworkTo(global::BasePlayer player)
-{
-	return RustAsia.Extensions.BaseNetworkableExt.ShouldNetworkToInvisible(this, player);
-}
 ```
 
 BasePlayer:
@@ -110,13 +99,6 @@ if (this.IsAdmin && !RustAsia.System.Variables.LootableAdmins && (this.IsSleepin
 {
 	return;
 }
-
-//OnReceiveTick(PlayerTick msg, bool wasPlayerStalled) (as IL edit)
-/*
- * ldarg.0
- * call RustAsia.Extensions.BasePlayerExt.TickESP
-*/
-RustAsia.Extensions.BasePlayerExt.TickESP(this);
 ```
 
 Bootstrap:
@@ -214,6 +196,33 @@ if (player.IsAdmin && RustAsia.System.Variables.FreeBuild)
 }
 ```
 
-*Step 5:* Re-compile HTNPlayer
+*Step 5:* Re-compile HTNPlayer, save the assembly.
+
+*Step 6:* Open [ILSpy](https://github.com/icsharpcode/ILSpy) with [Reflexil](https://github.com/sailro/Reflexil) and add the following changes.
+
+BasePlayer
+```csharp
+//OnReceiveTick(PlayerTick msg, bool wasPlayerStalled) (as IL edit)
+/*
+ * ldarg.0
+ * call RustAsia.Extensions.BasePlayerExt.TickESP
+*/
+RustAsia.Extensions.BasePlayerExt.TickESP(this);
+```
+
+BaseNetworkable:
+```csharp
+//The following edit should be done (as IL edit)
+/*
+ * ldarg.0
+ * ldarg.1
+ * call RustAsia.Extensions.BaseNetworkableExt.ShouldNetworkToInvisible
+ * ret
+*/
+public virtual bool ShouldNetworkTo(global::BasePlayer player)
+{
+	return RustAsia.Extensions.BaseNetworkableExt.ShouldNetworkToInvisible(this, player);
+}
+```
 
 *Step 6:* Save the assembly, you're done!
