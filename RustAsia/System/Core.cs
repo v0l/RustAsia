@@ -1,4 +1,4 @@
-﻿using RustAsia.Stats;
+﻿//using RustAsia.Stats;
 using System;
 using System.Net;
 using System.Reflection;
@@ -17,8 +17,8 @@ namespace RustAsia.System
             try
             {
                 Log($"Starting {Name}");
-                RedisPublisher = await RedisPublisher.ConnectAsync(new IPEndPoint(IPAddress.Loopback, 6379));
-                Tracker.Start();
+                //RedisPublisher = await RedisPublisher.ConnectAsync(new IPEndPoint(IPAddress.Loopback, 6379));
+                //Tracker.Start();
                 Admin.Commands.InsertCommands();
             }
             catch (Exception ex)

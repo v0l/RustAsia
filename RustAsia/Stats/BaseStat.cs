@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Collections.Generic;
 using System.Text;
 using ProtoBuf;
@@ -13,3 +13,4 @@ namespace RustAsia.Stats
         public DateTime LogTime { get; set; } = DateTime.Now;
     }
 }
+*/
