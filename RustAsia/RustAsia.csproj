@@ -33,6 +33,9 @@
     <Reference Include="Facepunch.System">
       <HintPath>..\..\..\..\..\..\steamcmd\steamapps\common\rust_dedicated\RustDedicated_Data\Managed\Facepunch.System.dll</HintPath>
     </Reference>
+    <Reference Include="Facepunch.Unity">
+      <HintPath>..\..\..\..\..\..\steamcmd\steamapps\common\rust_dedicated\RustDedicated_Data\Managed\Facepunch.Unity.dll</HintPath>
+    </Reference>
     <Reference Include="Facepunch.UnityEngine">
       <HintPath>..\..\..\..\..\..\steamcmd\steamapps\common\rust_dedicated\RustDedicated_Data\Managed\Facepunch.UnityEngine.dll</HintPath>
     </Reference>
