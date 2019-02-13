@@ -92,7 +92,24 @@ BasePlayer:
 && (!this.IsAdmin || !RustAsia.System.Variables.LootableAdmins)
 
 //CreateCorpse()
-if (!this.IsAdmin || RustAsia.System.Variables.LootableAdmins) { /*lootableCorpse.TakeFrom...*/ } 
+if (!this.IsAdmin || Variables.LootableAdmins)
+{
+	lootableCorpse.TakeFrom(new ItemContainer[]
+	{
+		this.inventory.containerMain,
+		this.inventory.containerWear,
+		this.inventory.containerBelt
+	});
+}
+else
+{
+	ItemContainer nc = new ItemContainer();
+	nc.AddItem(ItemManager.FindItemDefinition(363467698), 1);
+	lootableCorpse.TakeFrom(new ItemContainer[]
+	{
+		nc
+	});
+}
 
 //Hurt()
 if (this.IsAdmin && !RustAsia.System.Variables.LootableAdmins && (this.IsSleeping() || this.IsWounded()))
