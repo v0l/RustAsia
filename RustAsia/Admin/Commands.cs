@@ -20,34 +20,6 @@ namespace RustAsia.Admin
         {
             new ConsoleSystem.Command
             {
-                Name = "infinate_ammo",
-                Parent = "global",
-                FullName = "global.infinate_ammo",
-                ServerAdmin = true,
-                Variable = false,
-                Call = delegate (ConsoleSystem.Arg arg)
-                {
-                    var basePlayer = arg.Player();
-                    if (basePlayer != null)
-                    {
-                        var i = basePlayer.GetHeldEntity();
-                        if(i != null)
-                        {
-                            if(i is BaseProjectile p)
-                            {
-                                p.UsingInfiniteAmmoCheat = !p.UsingInfiniteAmmoCheat;
-                                basePlayer.ChatMessage($"Infinate ammo {(p.UsingInfiniteAmmoCheat ? "enabled" : "disabled")}");
-                            }
-                            else
-                            {
-                                basePlayer.ChatMessage($"{i.GetType().Name} is not BaseProjectile");
-                            }
-                        }
-                    }
-                }
-            },
-            new ConsoleSystem.Command
-            {
                 Name = "freebuild",
                 Parent = "global",
                 FullName = "global.freebuild",

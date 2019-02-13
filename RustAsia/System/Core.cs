@@ -9,7 +9,7 @@ namespace RustAsia.System
     public static class Core
     {
         public static readonly string Version = "v1.0.2";
-        public static readonly string Name = $"RustAsia {Version} (Rust v{Rust.Protocol.printable}-{Facepunch.BuildInfo.Current.Scm.ChangeId})";
+        public static string Name => $"RustAsia {Version} (Rust v{Rust.Protocol.printable}-{Facepunch.BuildInfo.Current.Scm.ChangeId})";
 
         public static async Task Init(Action<string> logFunction)
         {
